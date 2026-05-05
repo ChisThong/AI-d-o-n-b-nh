@@ -28,6 +28,18 @@ def load_predictor():
         return predictor
     return None
 
+def train_model():
+    """Train the model from raw data and save it."""
+    df = load_training_data()
+    disease_descriptions = load_disease_descriptions()
+    X, y, symptoms_list = preprocess_symptoms(df)
+
+    predictor = DiseasePredictor()
+    predictor.train(X, y, symptoms_list, disease_descriptions)
+    predictor.save()
+    return predictor
+
+
 def main():
     st.title("🩺 AI Dự đoán Bệnh từ Triệu chứng")
     st.markdown("""
@@ -38,7 +50,16 @@ def main():
     predictor = load_predictor()
 
     if predictor is None:
-        st.error("❌ Chưa tìm thấy mô hình! Vui lòng chạy `python train.py` để huấn luyện AI trước.")
+        st.error("❌ Chưa tìm thấy mô hình.")
+        st.info("Nếu bạn đang chạy trên môi trường mới, hãy huấn luyện model trước.")
+        if st.button("🚀 Huấn luyện mô hình ngay"):
+            with st.spinner("Đang huấn luyện mô hình... Xin chờ một lát..."):
+                try:
+                    predictor = train_model()
+                    st.success("Huấn luyện hoàn tất! App sẽ tải lại sau.")
+                    st.experimental_rerun()
+                except Exception as e:
+                    st.error(f"Huấn luyện thất bại: {e}")
         return
 
     st.subheader("Nhập các triệu chứng bạn đang gặp phải:")
