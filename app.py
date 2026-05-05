@@ -57,6 +57,7 @@ def main():
                 try:
                     predictor = train_model()
                     st.success("Huấn luyện hoàn tất! App sẽ tải lại sau.")
+                    st.cache_resource.clear()
                     st.rerun()
                 except Exception as e:
                     st.error(f"Huấn luyện thất bại: {e}")
