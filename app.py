@@ -84,6 +84,15 @@ def main():
 
         with st.spinner("🧠 AI đang phân tích dữ liệu..."):
             try:
+                normalized_model_symptoms = [s.lower() for s in predictor.symptoms_list]
+                recognized = [sym for sym in symptoms if sym in normalized_model_symptoms]
+                unrecognized = [sym for sym in symptoms if sym not in normalized_model_symptoms]
+
+                if not recognized:
+                    st.error("❌ AI không nhận diện được bất kỳ triệu chứng nào. Hệ thống từ chối chẩn đoán để đảm bảo tính chính xác.")
+                    st.warning(f"⚠️ Các triệu chứng chưa được hiểu: {', '.join(unrecognized)}")
+                    return
+
                 results = predictor.predict_top_k(symptoms, top_k=3)
 
                 st.success("✅ Phân tích hoàn tất!")
@@ -100,9 +109,6 @@ def main():
 
                 if len(results) == 0:
                     st.warning("Không có dự đoán. Vui lòng kiểm tra lại các triệu chứng đã nhập.")
-
-                recognized = [sym for sym in symptoms if sym in [s.lower() for s in predictor.symptoms_list]]
-                unrecognized = [sym for sym in symptoms if sym not in [s.lower() for s in predictor.symptoms_list]]
 
                 if recognized:
                     st.markdown(f"**✅ Triệu chứng được nhận diện:** {', '.join(recognized)}")
